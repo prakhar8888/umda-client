@@ -3,13 +3,20 @@ import React, { useEffect, useState } from "react";
 function AdminLogin() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
 
-  // ✅ Don't redirect if already on this page
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("adminLoggedIn");
-    if (isLoggedIn === "true") {
-      // Already logged in, redirect to products panel
-      window.location.href = "/admin/products";
+    try {
+      console.log("📱 AdminLogin Mounted");
+      const isLoggedIn = localStorage.getItem("adminLoggedIn");
+      if (isLoggedIn === "true") {
+        window.location.href = "/admin/products";
+      } else {
+        setMounted(true); // Only render form after mounted
+      }
+    } catch (err) {
+      console.error("❌ localStorage error", err);
+      setMounted(true);
     }
   }, []);
 
@@ -19,20 +26,31 @@ function AdminLogin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // 🔐 Replace with your own login logic or credentials
-    if (form.username === "admin" && form.password === "password") {
-      localStorage.setItem("adminLoggedIn", "true");
-      window.location.href = "/admin/products";
-    } else {
-      setError("❌ Invalid credentials");
+    try {
+      if (form.username === "admin" && form.password === "password") {
+        localStorage.setItem("adminLoggedIn", "true");
+        window.location.href = "/admin/products";
+      } else {
+        setError("❌ Invalid credentials. Try again.");
+      }
+    } catch (err) {
+      console.error("❌ Login failed", err);
+      setError("⚠️ Login failed. Please try again.");
     }
   };
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fefae0] text-gray-700">
+        <p>⏳ Loading...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fefae0]">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-[#6a4c93]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff8dc] via-[#fdf6e3] to-[#fefae0] px-4">
+      <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md border border-[#e0c3fc]">
+        <h2 className="text-3xl font-bold mb-6 text-center text-[#6a4c93] font-serif">
           🔐 Admin Login
         </h2>
 
@@ -47,7 +65,7 @@ function AdminLogin() {
             placeholder="Username"
             value={form.username}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#6a4c93]"
             required
           />
           <input
@@ -56,16 +74,20 @@ function AdminLogin() {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#6a4c93]"
             required
           />
           <button
             type="submit"
-            className="w-full bg-[#6a4c93] text-white py-2 rounded hover:bg-[#5a3c83]"
+            className="w-full bg-[#6a4c93] text-white py-2 rounded hover:bg-[#5a3c83] transition-all duration-200"
           >
             Login
           </button>
         </form>
+
+        <p className="text-xs text-center text-gray-400 mt-6">
+          Default credentials: <strong>admin / password</strong>
+        </p>
       </div>
     </div>
   );

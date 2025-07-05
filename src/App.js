@@ -9,25 +9,29 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout"; // ✅ Razorpay Checkout
+import Checkout from "./pages/Checkout";
 
 import AdminLogin from "./pages/AdminLogin";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
 import AdminProductForm from "./pages/AdminProductForm";
-import AdminAllProducts from "./pages/AdminAllProducts"; // ✅ NEW read-only view
+import AdminAllProducts from "./pages/AdminAllProducts";
 
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 function App() {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
+      {/* Global navbar */}
       <Navbar />
+
+      {/* Home hero section (optional: only show on homepage if needed) */}
       <Hero />
 
+      {/* Main content routes */}
       <main className="flex-1">
         <Routes>
-          {/* 🛍️ Public Routes */}
+          {/* 🛍️ Customer-facing Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
@@ -79,6 +83,7 @@ function App() {
         </Routes>
       </main>
 
+      {/* Global footer */}
       <Footer />
     </div>
   );
