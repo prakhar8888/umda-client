@@ -1,5 +1,3 @@
-// src/pages/AdminProducts.js
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -9,13 +7,18 @@ import {
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchProducts = async () => {
     try {
       const res = await getAllProducts();
       setProducts(res.data);
+      setLoading(false);
     } catch (err) {
       console.error("❌ Error fetching products:", err);
+      setError("Failed to load products.");
+      setLoading(false);
     }
   };
 
@@ -32,6 +35,12 @@ function AdminProducts() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  if (loading)
+    return <div className="p-10 text-center text-gray-600">Loading products...</div>;
+
+  if (error)
+    return <div className="p-10 text-center text-red-600">{error}</div>;
 
   return (
     <div className="p-6 md:p-10">

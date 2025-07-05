@@ -1,8 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function AdminLogin() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 🛑 Prevent crashing on mobile by delaying useEffect
+  useEffect(() => {
+    try {
+      console.log("📱 AdminLogin Mounted");
+
+      // Delay redirect until component is mounted fully
+      const isLoggedIn = localStorage?.getItem("adminLoggedIn");
+      if (isLoggedIn === "true") {
+        window.location.href = "/admin/products";
+      }
+    } catch (err) {
+      console.error("❌ Error accessing localStorage:", err);
+    } finally {
+      setIsMounted(true);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -10,19 +28,27 @@ function AdminLogin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     try {
       if (form.username === "admin" && form.password === "password") {
         localStorage.setItem("adminLoggedIn", "true");
-        window.location.href = "/admin/products"; // ✅ Redirect only after successful login
+        window.location.href = "/admin/products";
       } else {
         setError("❌ Invalid credentials. Try again.");
       }
     } catch (err) {
-      console.error("❌ Login error:", err);
-      setError("⚠️ Something went wrong. Please try again.");
+      console.error("❌ Login failed", err);
+      setError("⚠️ Login failed. Please try again.");
     }
   };
+
+  // Show fallback loader if not mounted yet
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fefae0]">
+        <p className="text-gray-500">⏳ Loading Admin Panel...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#fefae0] px-4">
