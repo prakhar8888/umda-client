@@ -1,5 +1,3 @@
-// 📄 ecommerce-client/src/components/ProductCard.js
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
@@ -15,7 +13,7 @@ function ProductCard({ product }) {
     <div className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition duration-300">
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.image}
+          src={product.image} // ✅ consistent with backend
           alt={product.name}
           className="w-full h-60 object-cover rounded"
         />

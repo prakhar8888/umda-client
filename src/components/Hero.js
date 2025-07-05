@@ -1,32 +1,23 @@
-// 📄 ecommerce-client/src/components/Hero.js
-
 import React from "react";
+import { Link } from "react-router-dom";
 
-function Hero() {
+const Hero = () => {
   return (
-    <section className="relative h-[80vh] flex items-center justify-center bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage:
-          "url('https://i.pinimg.com/originals/96/ea/12/96ea12d17e0fd6748469f6820b97eb2e.jpg')",
-      }}
-    >
-      {/* 🔲 Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" />
-
-      {/* 🧵 Content */}
-      <div className="relative z-10 text-center text-white max-w-3xl px-4">
-        <h1 className="text-4xl md:text-5xl font-bold font-serif mb-4">
-          Embrace Indian Elegance
-        </h1>
-        <p className="text-lg md:text-xl mb-6">
-          Discover handcrafted ethnic wear rooted in tradition and beauty.
-        </p>
-        <button className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-6 py-2 rounded transition duration-200">
-          Shop Now
-        </button>
-      </div>
-    </section>
+    <div className="bg-gradient-to-r from-[#fff9f2] via-[#fdf0e5] to-[#fefae0] text-center py-20 px-6 mt-16 shadow-inner border-b border-yellow-200">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-[#6a4c93] mb-4 font-serif drop-shadow-md">
+        ✨ Celebrate Indian Elegance ✨
+      </h1>
+      <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
+        Explore timeless ethnic fashion — handcrafted with love, rooted in tradition, designed for the modern you.
+      </p>
+      <Link
+        to="/shop"
+        className="inline-block bg-[#6a4c93] text-white px-6 py-3 rounded-lg text-sm font-semibold shadow-lg hover:bg-[#5a3c83] transition duration-200"
+      >
+        🛍️ Shop Now
+      </Link>
+    </div>
   );
-}
+};
 
 export default Hero;

@@ -1,37 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { BACKEND_URL } from "../config";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  getProductById,
+  addProduct,
+  updateProduct,
+} from "../api/productService";
 
-function AdminProductForm() {
+const AdminProductForm = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { id } = useParams(); // if exists, we're editing
-  const [isAllowed, setIsAllowed] = useState(true);
+  const isEdit = !!id;
 
   const [form, setForm] = useState({
     name: "",
     price: "",
     image: "",
-    category: "",
     description: "",
+    category: "",
   });
 
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("adminLoggedIn");
-    if (isLoggedIn !== "true") {
-      setIsAllowed(false);
-      window.location.href = "/admin/login";
-    }
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (id) {
-      axios
-        .get(`${BACKEND_URL}/api/products/${id}`)
-        .then((res) => setForm(res.data))
-        .catch((err) => console.error("❌ Failed to fetch product:", err));
+    if (isEdit) {
+      getProductById(id)
+        .then((data) => setForm(data))
+        .catch((err) => setError("❌ Failed to load product."));
     }
-  }, [id]);
+  }, [id, isEdit]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,82 +36,118 @@ function AdminProductForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      if (id) {
-        await axios.put(`${BACKEND_URL}/api/products/${id}`, form);
-        alert("✅ Product updated!");
+      if (isEdit) {
+        await updateProduct(id, form);
       } else {
-        await axios.post(`${BACKEND_URL}/api/products`, form);
-        alert("✅ New product added!");
+        await addProduct(form);
       }
-
       navigate("/admin/products");
     } catch (err) {
-      console.error("❌ Submission failed:", err);
-      alert("❌ Error occurred.");
+      setError("❌ Submission failed. Check all fields.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!isAllowed) return null;
-
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-white shadow-md rounded">
-      <h2 className="text-2xl font-bold mb-6 text-[#6a4c93] text-center">
-        {id ? "✏️ Edit Product" : "➕ Add New Product"}
-      </h2>
+    <div className="min-h-screen bg-[#fffdf6] py-10 px-4">
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md border border-yellow-100">
+        <h2 className="text-2xl font-bold text-[#6a4c93] font-serif mb-6 text-center">
+          {isEdit ? "✏️ Edit Product" : "➕ Add New Product"}
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Product Name"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          name="price"
-          value={form.price}
-          type="number"
-          onChange={handleChange}
-          placeholder="Price"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          name="image"
-          value={form.image}
-          onChange={handleChange}
-          placeholder="Image URL"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          name="category"
-          value={form.category}
-          onChange={handleChange}
-          placeholder="Category (e.g. Saree, Kurta)"
-          className="w-full p-2 border rounded"
-        />
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          placeholder="Description"
-          className="w-full p-2 border rounded"
-          rows={4}
-        ></textarea>
+        {error && (
+          <div className="text-red-600 text-center mb-4 text-sm">{error}</div>
+        )}
 
-        <button
-          type="submit"
-          className="w-full bg-[#6a4c93] text-white py-2 rounded hover:bg-[#5a3c83]"
-        >
-          {id ? "Update Product ✅" : "Add Product ✅"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block mb-1 text-gray-700 font-medium">Name</label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              placeholder="e.g., Red Banarasi Silk Saree"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-gray-700 font-medium">Price (₹)</label>
+            <input
+              type="number"
+              name="price"
+              value={form.price}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              placeholder="e.g., 2499"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-gray-700 font-medium">Category</label>
+            <input
+              type="text"
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              placeholder="e.g., Indian Ethnic / Saree / Kurti"
+            />
+          </div>
+
+          <div>
+            <label className="block mb-1 text-gray-700 font-medium">Image URL</label>
+            <input
+              type="url"
+              name="image"
+              value={form.image}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              placeholder="Paste image link here"
+            />
+            {form.image && (
+              <img
+                src={form.image}
+                alt="Preview"
+                className="w-32 h-32 mt-3 object-cover rounded border"
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="block mb-1 text-gray-700 font-medium">Description</label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              rows="4"
+              placeholder="Describe the ethnic look, fabric, embroidery, etc."
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#6a4c93] text-white py-2 rounded hover:bg-[#5a3c83] transition"
+          >
+            {loading ? "Saving..." : isEdit ? "Update Product" : "Add Product"}
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
 
 export default AdminProductForm;

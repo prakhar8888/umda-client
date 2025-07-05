@@ -9,12 +9,14 @@ import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout"; // ✅ Added for Razorpay
+import Checkout from "./pages/Checkout"; // ✅ Razorpay Checkout
 
+import AdminLogin from "./pages/AdminLogin";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
 import AdminProductForm from "./pages/AdminProductForm";
-import AdminLogin from "./pages/AdminLogin";
+import AdminAllProducts from "./pages/AdminAllProducts"; // ✅ NEW read-only view
+
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 function App() {
@@ -30,7 +32,7 @@ function App() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} /> {/* ✅ Razorpay Checkout */}
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* 🔐 Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -63,6 +65,14 @@ function App() {
             element={
               <ProtectedAdminRoute>
                 <AdminOrders />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/all-products"
+            element={
+              <ProtectedAdminRoute>
+                <AdminAllProducts />
               </ProtectedAdminRoute>
             }
           />

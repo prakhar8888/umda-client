@@ -1,97 +1,82 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { BACKEND_URL } from "../config";
 
-function AdminOrders() {
+const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    async function fetchOrders() {
-      try {
-        const res = await axios.get("http://localhost:5000/api/orders");
-        setOrders(res.data);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
-      }
-    }
-
-    fetchOrders();
+    axios
+      .get(`${BACKEND_URL}/api/orders`)
+      .then((res) => setOrders(res.data))
+      .catch((err) => {
+        console.error(err);
+        setError("❌ Failed to load orders.");
+      });
   }, []);
 
-  const filteredOrders = orders.filter((order) =>
-    order.customerName.toLowerCase().includes(search.toLowerCase()) ||
-    order.email?.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold mb-4 text-center text-[#5D4037]">
-        📦 Admin: All Orders
+    <div className="min-h-screen bg-[#fffdf6] p-8">
+      <h2 className="text-2xl font-bold text-[#6a4c93] font-serif mb-6">
+        📦 Admin — Orders
       </h2>
 
-      {/* 🔍 Search Bar */}
-      <div className="mb-6 text-center">
-        <input
-          type="text"
-          placeholder="Search by name or email"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded w-80 shadow"
-        />
-      </div>
+      {error && <p className="text-red-600 mb-4 text-sm">{error}</p>}
 
-      {filteredOrders.length === 0 ? (
-        <p className="text-center text-gray-600">No matching orders.</p>
-      ) : (
-        <table className="w-full table-auto border-collapse border border-gray-300 shadow">
-          <thead>
-            <tr className="bg-amber-100 text-sm text-gray-800">
-              <th className="border px-3 py-2">Customer</th>
-              <th className="border px-3 py-2">Email</th>
-              <th className="border px-3 py-2">Phone</th>
-              <th className="border px-3 py-2">Total</th>
-              <th className="border px-3 py-2">Items</th>
-              <th className="border px-3 py-2">Status</th>
-              <th className="border px-3 py-2">Txn ID</th>
+      <div className="overflow-x-auto bg-white border border-yellow-100 rounded-lg shadow">
+        <table className="min-w-full text-sm">
+          <thead className="bg-[#fdf0e5] text-[#6a4c93] text-left">
+            <tr>
+              <th className="py-3 px-4">Customer</th>
+              <th className="py-3 px-4">Email</th>
+              <th className="py-3 px-4">Phone</th>
+              <th className="py-3 px-4">Address</th>
+              <th className="py-3 px-4">Items</th>
+              <th className="py-3 px-4">Total</th>
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.map((order) => (
-              <tr key={order._id} className="text-sm text-center bg-white hover:bg-gray-50">
-                <td className="border px-3 py-2">{order.customerName}</td>
-                <td className="border px-3 py-2">{order.email}</td>
-                <td className="border px-3 py-2">{order.phone}</td>
-                <td className="border px-3 py-2 font-semibold">₹{order.totalAmount}</td>
-                <td className="border px-3 py-2 text-left">
-                  <ul className="list-disc list-inside">
-                    {order.items.map((item, idx) => (
-                      <li key={idx}>
+            {orders.map((order) => (
+              <tr
+                key={order._id}
+                className="border-t hover:bg-gray-50 transition"
+              >
+                <td className="py-3 px-4 font-medium text-[#6a4c93]">
+                  {order.customerName}
+                </td>
+                <td className="py-3 px-4">{order.email}</td>
+                <td className="py-3 px-4">{order.phone}</td>
+                <td className="py-3 px-4">{order.address}</td>
+                <td className="py-3 px-4">
+                  <ul className="list-disc ml-4 text-gray-700">
+                    {order.items.map((item, index) => (
+                      <li key={index}>
                         {item.name} × {item.quantity}
                       </li>
                     ))}
                   </ul>
                 </td>
-                <td className="border px-3 py-2">
-                  {order.isPaid ? (
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-semibold">
-                      ✅ Paid
-                    </span>
-                  ) : (
-                    <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold">
-                      ❌ Not Paid
-                    </span>
-                  )}
-                </td>
-                <td className="border px-3 py-2 text-xs text-gray-700">
-                  {order.paymentId || "—"}
+                <td className="py-3 px-4 font-bold text-green-700">
+                  ₹{order.totalAmount}
                 </td>
               </tr>
             ))}
+            {orders.length === 0 && (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="text-center py-8 text-gray-500 text-sm"
+                >
+                  No orders placed yet.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
-      )}
+      </div>
     </div>
   );
-}
+};
 
 export default AdminOrders;

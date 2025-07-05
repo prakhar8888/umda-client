@@ -29,7 +29,7 @@ function ProductDetails() {
   return (
     <div className="p-6 md:p-10 max-w-4xl mx-auto bg-white rounded-lg shadow-lg transition-all">
       <img
-        src={product.image}
+        src={product.image} // ✅ correct key
         alt={product.name}
         className="w-full h-96 object-cover rounded-md mb-6"
       />

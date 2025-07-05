@@ -1,154 +1,97 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { BACKEND_URL } from "../config";
+import { getAllProducts, deleteProduct } from "../api/productService";
+import { useNavigate } from "react-router-dom";
 
-function AdminProducts() {
-  const [isAllowed, setIsAllowed] = useState(true);
+const AdminProducts = () => {
   const [products, setProducts] = useState([]);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [form, setForm] = useState({});
+  const navigate = useNavigate();
 
-  // 🔐 Admin route protection
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("adminLoggedIn");
-    if (isLoggedIn !== "true") {
-      setIsAllowed(false);
-      window.location.href = "/admin/login";
-    }
-  }, []);
-
-  // 📦 Fetch products only if allowed
-  useEffect(() => {
-    if (isAllowed) fetchProducts();
-  }, [isAllowed]);
-
-  const fetchProducts = async () => {
+  const loadProducts = async () => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/products`);
-      setProducts(res.data);
+      const data = await getAllProducts();
+      setProducts(data);
     } catch (err) {
       console.error("❌ Failed to fetch products:", err);
     }
   };
 
-  const deleteProduct = async (id) => {
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      try {
-        await axios.delete(`${BACKEND_URL}/api/products/${id}`);
-        fetchProducts();
-      } catch (err) {
-        console.error("❌ Delete failed:", err);
-      }
+      await deleteProduct(id);
+      setProducts(products.filter((p) => p._id !== id));
     }
   };
-
-  const startEdit = (product) => {
-    setEditingProduct(product._id);
-    setForm(product);
-  };
-
-  const handleEditChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const saveEdit = async () => {
-    try {
-      await axios.put(`${BACKEND_URL}/api/products/${editingProduct}`, form);
-      setEditingProduct(null);
-      fetchProducts();
-    } catch (err) {
-      console.error("❌ Update failed:", err);
-    }
-  };
-
-  if (!isAllowed) return null;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-[#6a4c93]">
-        🛠️ Admin Panel: Manage Products
-      </h2>
-
-      {products.map((product) => (
-        <div
-          key={product._id}
-          className="border-b py-4 flex justify-between items-start gap-4"
+    <div className="p-6 bg-[#fffdf6] min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-[#6a4c93] font-serif">
+          📋 Admin - Product List
+        </h1>
+        <button
+          className="bg-[#6a4c93] text-white px-4 py-2 rounded shadow hover:bg-[#5a3c83] transition"
+          onClick={() => navigate("/admin/products/new")}
         >
-          {editingProduct === product._id ? (
-            <div className="flex flex-col w-full gap-2">
-              <input
-                name="name"
-                value={form.name}
-                onChange={handleEditChange}
-                placeholder="Product Name"
-                className="border p-2 rounded"
-              />
-              <input
-                name="price"
-                value={form.price}
-                onChange={handleEditChange}
-                placeholder="Price"
-                className="border p-2 rounded"
-              />
-              <input
-                name="image"
-                value={form.image}
-                onChange={handleEditChange}
-                placeholder="Image URL"
-                className="border p-2 rounded"
-              />
-              <input
-                name="category"
-                value={form.category}
-                onChange={handleEditChange}
-                placeholder="Category"
-                className="border p-2 rounded"
-              />
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleEditChange}
-                placeholder="Description"
-                className="border p-2 rounded"
-              />
-              <button
-                onClick={saveEdit}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                Save ✅
-              </button>
-            </div>
-          ) : (
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg">{product.name}</h3>
-              <p className="text-sm text-gray-700">₹{product.price}</p>
-              <p className="text-sm text-gray-500">{product.category}</p>
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-28 mt-2 rounded"
-              />
-            </div>
-          )}
+          ➕ Add Product
+        </button>
+      </div>
 
-          <div className="space-x-2 flex items-center">
-            <button
-              onClick={() => startEdit(product)}
-              className="text-blue-600 font-semibold"
-            >
-              Edit ✏️
-            </button>
-            <button
-              onClick={() => deleteProduct(product._id)}
-              className="text-red-600 font-semibold"
-            >
-              Delete ❌
-            </button>
-          </div>
-        </div>
-      ))}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow rounded-lg border border-yellow-100">
+          <thead className="bg-[#fdf0e5] text-[#6a4c93] font-semibold text-left">
+            <tr>
+              <th className="py-2 px-4">Image</th>
+              <th className="py-2 px-4">Name</th>
+              <th className="py-2 px-4">Price</th>
+              <th className="py-2 px-4">Category</th>
+              <th className="py-2 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product._id} className="border-t hover:bg-gray-50 text-sm">
+                <td className="py-2 px-4">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                </td>
+                <td className="py-2 px-4">{product.name}</td>
+                <td className="py-2 px-4">₹{product.price}</td>
+                <td className="py-2 px-4">{product.category}</td>
+                <td className="py-2 px-4 space-x-2">
+                  <button
+                    onClick={() => navigate(`/admin/products/edit/${product._id}`)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product._id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {products.length === 0 && (
+              <tr>
+                <td colSpan="5" className="text-center py-8 text-gray-500">
+                  No products found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-}
+};
 
 export default AdminProducts;
