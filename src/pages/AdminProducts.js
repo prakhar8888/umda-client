@@ -12,13 +12,13 @@ function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const res = await getAllProducts();
+      const data = await getAllProducts();
 
-      if (!res || !res.data || !Array.isArray(res.data)) {
-        throw new Error("Products data is not in expected format");
+      if (!Array.isArray(data)) {
+        throw new Error("❌ Products data is not an array");
       }
 
-      setProducts(res.data);
+      setProducts(data);
       setLoading(false);
     } catch (err) {
       console.error("🔥 Error while fetching products:", err);
@@ -42,14 +42,10 @@ function AdminProducts() {
   }, []);
 
   if (loading)
-    return <div className="p-10 text-center text-gray-600">Loading...</div>;
+    return <div className="p-10 text-center text-gray-600">⏳ Loading products...</div>;
 
   if (error)
-    return (
-      <div className="p-10 text-center text-red-600 font-bold">
-        {error}
-      </div>
-    );
+    return <div className="p-10 text-center text-red-600 font-bold">{error}</div>;
 
   return (
     <div className="p-6">
@@ -62,8 +58,9 @@ function AdminProducts() {
           ➕ Add Product
         </Link>
       </div>
-
-      {products && Array.isArray(products) && products.length > 0 ? (
+      {products.length === 0 ? (
+        <div className="text-center text-gray-600">No products found.</div>
+      ) : (
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-200">
             <tr>
@@ -105,8 +102,6 @@ function AdminProducts() {
             ))}
           </tbody>
         </table>
-      ) : (
-        <div className="text-center text-gray-600">No products found.</div>
       )}
     </div>
   );

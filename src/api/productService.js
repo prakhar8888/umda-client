@@ -4,8 +4,13 @@ import { BACKEND_URL } from "../config";
 const API = `${BACKEND_URL}/api/products`;
 
 export const getAllProducts = async () => {
-  const res = await axios.get(API);
-  return res.data;
+  try {
+    const res = await axios.get(API);
+    return res?.data || []; // ✅ Safe fallback
+  } catch (err) {
+    console.error("🔥 Error in getAllProducts:", err);
+    return []; // ✅ Empty array if error occurs
+  }
 };
 
 export const getProductById = async (id) => {
