@@ -1,24 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 function AdminLogin() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    try {
-      console.log("📱 AdminLogin Mounted");
-      const isLoggedIn = localStorage.getItem("adminLoggedIn");
-      if (isLoggedIn === "true") {
-        window.location.href = "/admin/products";
-      } else {
-        setMounted(true); // Only render form after mounted
-      }
-    } catch (err) {
-      console.error("❌ localStorage error", err);
-      setMounted(true);
-    }
-  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,29 +10,22 @@ function AdminLogin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     try {
       if (form.username === "admin" && form.password === "password") {
         localStorage.setItem("adminLoggedIn", "true");
-        window.location.href = "/admin/products";
+        window.location.href = "/admin/products"; // ✅ Redirect only after successful login
       } else {
         setError("❌ Invalid credentials. Try again.");
       }
     } catch (err) {
-      console.error("❌ Login failed", err);
-      setError("⚠️ Login failed. Please try again.");
+      console.error("❌ Login error:", err);
+      setError("⚠️ Something went wrong. Please try again.");
     }
   };
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fefae0] text-gray-700">
-        <p>⏳ Loading...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fff8dc] via-[#fdf6e3] to-[#fefae0] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#fefae0] px-4">
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md border border-[#e0c3fc]">
         <h2 className="text-3xl font-bold mb-6 text-center text-[#6a4c93] font-serif">
           🔐 Admin Login
