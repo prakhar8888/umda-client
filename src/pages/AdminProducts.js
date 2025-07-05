@@ -15,7 +15,7 @@ function AdminProducts() {
       const res = await getAllProducts();
 
       if (!res || !res.data || !Array.isArray(res.data)) {
-        throw new Error("Unexpected response format");
+        throw new Error("Products data is not in expected format");
       }
 
       setProducts(res.data);
@@ -62,9 +62,8 @@ function AdminProducts() {
           ➕ Add Product
         </Link>
       </div>
-      {products.length === 0 ? (
-        <div className="text-center text-gray-600">No products found.</div>
-      ) : (
+
+      {products && Array.isArray(products) && products.length > 0 ? (
         <table className="w-full text-sm text-left">
           <thead className="bg-gray-200">
             <tr>
@@ -106,6 +105,8 @@ function AdminProducts() {
             ))}
           </tbody>
         </table>
+      ) : (
+        <div className="text-center text-gray-600">No products found.</div>
       )}
     </div>
   );
