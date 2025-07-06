@@ -21,24 +21,24 @@ import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 function App() {
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col">
-      {/* Global navbar */}
+    <div className="bg-[#fffdf6] min-h-screen flex flex-col font-sans">
+      {/* 🧵 Navbar for UMDA Fashion House */}
       <Navbar />
 
-      {/* Home hero section (optional: only show on homepage if needed) */}
+      {/* 🎯 Hero section (for homepage) */}
       <Hero />
 
-      {/* Main content routes */}
+      {/* 🔄 Main Route Handling */}
       <main className="flex-1">
         <Routes>
-          {/* 🛍️ Customer-facing Routes */}
+          {/* 🌟 Customer Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
 
-          {/* 🔐 Admin Routes */}
+          {/* 🔐 Admin Routes (Protected) */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin/products"
@@ -83,7 +83,7 @@ function App() {
         </Routes>
       </main>
 
-      {/* Global footer */}
+      {/* 📦 Footer */}
       <Footer />
     </div>
   );

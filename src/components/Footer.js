@@ -8,11 +8,11 @@ const Footer = () => {
         {/* Brand Info */}
         <div>
           <h2 className="text-xl font-bold text-[#6a4c93] font-serif mb-2">
-            🧵 Ethnic Threads
+            👗 UMDA Fashion House
           </h2>
           <p>
-            Celebrating the beauty of Indian tradition through handcrafted
-            fashion. Every piece is made with love ❤️
+            Redefining elegance from the heart of Lucknow 🕌. Wear the vibe,
+            flaunt the culture 💫
           </p>
         </div>
 
@@ -51,15 +51,15 @@ const Footer = () => {
             📍 Contact
           </h3>
           <ul className="space-y-1">
-            <li>📌 Jaipur, Rajasthan, India</li>
-            <li>📧 support@ethnicthreads.in</li>
-            <li>📞 +91 99999 99999</li>
+            <li>📌 Lucknow, Uttar Pradesh, India</li>
+            <li>📧 prakhargupta.4299@gmail.com</li>
+            <li>📞 +91 8707748399</li>
           </ul>
         </div>
       </div>
 
       <div className="text-center text-xs text-gray-500 mt-10">
-        © {new Date().getFullYear()} Ethnic Threads. All rights reserved.
+        © {new Date().getFullYear()} UMDA Fashion House. All rights reserved.
       </div>
     </footer>
   );
