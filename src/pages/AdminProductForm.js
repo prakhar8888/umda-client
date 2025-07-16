@@ -25,13 +25,22 @@ const AdminProductForm = () => {
   useEffect(() => {
     if (isEdit) {
       getProductById(id)
-        .then((data) => setForm(data))
-        .catch((err) => setError("❌ Failed to load product."));
+        .then((data) => {
+          setForm({
+            name: data.name || "",
+            price: data.price?.toString() || "",
+            category: data.category || "",
+            description: data.description || "",
+            image: data.image?.url || "", // ← properly extract image URL
+          });
+        })
+        .catch(() => setError("❌ Failed to load product."));
     }
   }, [id, isEdit]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -39,15 +48,37 @@ const AdminProductForm = () => {
     setLoading(true);
     setError("");
 
+    const trimmedForm = {
+      ...form,
+      name: form.name.trim(),
+      category: form.category.trim(),
+      description: form.description.trim(),
+      image: form.image.trim(),
+      price: parseFloat(form.price),
+    };
+
     try {
-      if (isEdit) {
-        await updateProduct(id, form);
-      } else {
-        await addProduct(form);
+      // Basic client-side validation
+      if (
+        !trimmedForm.name ||
+        !trimmedForm.category ||
+        !trimmedForm.description ||
+        !trimmedForm.image ||
+        isNaN(trimmedForm.price)
+      ) {
+        throw new Error("All fields must be filled correctly.");
       }
+
+      if (isEdit) {
+        await updateProduct(id, trimmedForm);
+      } else {
+        await addProduct(trimmedForm);
+      }
+
       navigate("/admin/products");
     } catch (err) {
-      setError("❌ Submission failed. Check all fields.");
+      console.error("Product submission error:", err);
+      setError("❌ Submission failed. Check all fields and try again.");
     } finally {
       setLoading(false);
     }
@@ -100,7 +131,7 @@ const AdminProductForm = () => {
               onChange={handleChange}
               required
               className="w-full border border-gray-300 rounded px-4 py-2"
-              placeholder="e.g., Indian Ethnic / Saree / Kurti"
+              placeholder="e.g., Saree, Kurta, Bridal, Anarkali"
             />
           </div>
 

@@ -1,8 +1,7 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
 import Footer from "./components/Footer";
 
 import Home from "./pages/Home";
@@ -18,27 +17,28 @@ import AdminProductForm from "./pages/AdminProductForm";
 import AdminAllProducts from "./pages/AdminAllProducts";
 
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import Hero from "./components/Hero";
 
 function App() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <div className="bg-[#fffdf6] min-h-screen flex flex-col font-sans">
-      {/* 🧵 Navbar for UMDA Fashion House */}
       <Navbar />
 
-      {/* 🎯 Hero section (for homepage) */}
-      <Hero />
+      {/* Show Hero only on Home */}
+      {isHome && <Hero />}
 
-      {/* 🔄 Main Route Handling */}
-      <main className="flex-1">
+      <main className="flex-1 mt-20">
         <Routes>
-          {/* 🌟 Customer Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
 
-          {/* 🔐 Admin Routes (Protected) */}
+          {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin/products"
@@ -83,7 +83,6 @@ function App() {
         </Routes>
       </main>
 
-      {/* 📦 Footer */}
       <Footer />
     </div>
   );
