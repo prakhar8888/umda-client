@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageWrapper from "../components/PageWrapper";
+import { getAllProducts } from "../api/productService"; // ✅ Get live data
 
 const Home = () => {
   const categories = [
@@ -22,6 +23,17 @@ const Home = () => {
       image: "https://i.imgur.com/9RpLJfj.jpg",
     },
   ];
+
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      const data = await getAllProducts();
+      setProducts(data);
+    };
+
+    loadProducts();
+  }, []);
 
   return (
     <PageWrapper>
@@ -51,8 +63,12 @@ const Home = () => {
               }}
             >
               <img
-                src={cat.image}
+                src={cat.image || "/assets/no-image.png"}
                 alt={cat.name}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/assets/no-image.png";
+                }}
                 className="w-full h-48 object-cover transition-all duration-300 group-hover:brightness-90"
               />
               <div className="p-4 text-center">
@@ -90,6 +106,45 @@ const Home = () => {
             🛍️ Browse Collection
           </Link>
         </motion.div>
+
+        {/* 🔥 New Arrivals Section */}
+        <div className="mt-20 px-4 max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold text-[#6a4c93] mb-6 text-center font-serif">
+            🆕 New Arrivals
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {products.length === 0 ? (
+              <p className="text-center text-gray-500 col-span-full">
+                No products found.
+              </p>
+            ) : (
+              products.map((product) => (
+                <div
+                  key={product._id}
+                  className="border shadow-md p-4 rounded-lg transition-transform hover:scale-105 bg-white"
+                >
+                  <img
+                    src={product.image || "/assets/no-image.png"}
+                    alt={product.name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/assets/no-image.png";
+                    }}
+                    className="w-full h-48 object-cover rounded-md mb-3"
+                  />
+                  <h3 className="text-xl font-semibold text-[#6a4c93]">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 text-sm">{product.description}</p>
+                  <p className="text-lg font-bold mt-2 text-pink-600">
+                    ₹{product.price}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </PageWrapper>
   );

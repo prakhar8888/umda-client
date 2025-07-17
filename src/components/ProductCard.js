@@ -23,11 +23,15 @@ function ProductCard({ product }) {
         </div>
       </div>
 
-      {/* Product Image & Info */}
+      {/* 🖼 Product Image with Fallback */}
       <Link to={`/product/${product._id}`}>
         <motion.img
-          src={product.image}
-          alt={product.name}
+          src={product.image || "/assets/no-image.png"}
+          alt={product.name || "Product Image"}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/assets/no-image.png";
+          }}
           className="w-full h-60 object-cover rounded-md transition duration-300 group-hover:brightness-90"
           whileHover={{ scale: 1.01 }}
         />
@@ -37,7 +41,7 @@ function ProductCard({ product }) {
         <p className="text-gray-700 font-medium">₹{product.price}</p>
       </Link>
 
-      {/* Action Buttons */}
+      {/* 🛒 Action Buttons */}
       <div className="flex justify-between items-center mt-4">
         <button
           onClick={handleAddToCart}

@@ -1,19 +1,23 @@
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
+// 🧱 Layout Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+// 🏠 Pages
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 
+// 🔐 Admin Pages
 import AdminLogin from "./pages/AdminLogin";
 import AdminOrders from "./pages/AdminOrders";
 import AdminProducts from "./pages/AdminProducts";
-import AdminProductForm from "./pages/AdminProductForm";
+import AdminAddProduct from "./pages/AdminAddProduct"; // ✅ Correct import
+import AdminProductForm from "./pages/AdminProductForm"; // ✅ Only for editing
 import AdminAllProducts from "./pages/AdminAllProducts";
 
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
@@ -27,18 +31,19 @@ function App() {
     <div className="bg-[#fffdf6] min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      {/* Show Hero only on Home */}
+      {/* 🎯 Show Hero only on Home */}
       {isHome && <Hero />}
 
       <main className="flex-1 mt-20">
         <Routes>
+          {/* 🧑‍🎓 Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
 
-          {/* Admin Routes */}
+          {/* 🔐 Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin/products"
@@ -52,7 +57,7 @@ function App() {
             path="/admin/products/new"
             element={
               <ProtectedAdminRoute>
-                <AdminProductForm />
+                <AdminAddProduct /> {/* ✅ FINAL FIX */}
               </ProtectedAdminRoute>
             }
           />
@@ -60,7 +65,7 @@ function App() {
             path="/admin/products/edit/:id"
             element={
               <ProtectedAdminRoute>
-                <AdminProductForm />
+                <AdminProductForm /> {/* ✅ ONLY for edit */}
               </ProtectedAdminRoute>
             }
           />

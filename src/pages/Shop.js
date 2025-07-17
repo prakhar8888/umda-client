@@ -1,8 +1,10 @@
+// 📄 frontend/pages/Shop.jsx
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ProductCard from "../components/ProductCard";
 import { BACKEND_URL } from "../config";
-import PageWrapper from "../components/PageWrapper"; // ✅ Added
+import PageWrapper from "../components/PageWrapper";
 
 const categories = ["All", "Kurta", "Saree", "Dupatta", "Skirt"];
 const sortOptions = ["None", "Low to High", "High to Low"];
@@ -17,13 +19,13 @@ function Shop() {
     const fetchProducts = async () => {
       try {
         const encodedKeyword = encodeURIComponent(keyword);
-        let url = `${BACKEND_URL}/api/products?keyword=${encodedKeyword}`;
-        const res = await axios.get(url);
+        const res = await axios.get(`${BACKEND_URL}/api/products?keyword=${encodedKeyword}`);
         let data = res.data;
 
+        // ✅ Proper category filter using item.category
         if (category !== "All") {
           data = data.filter((item) =>
-            item.name.toLowerCase().includes(category.toLowerCase())
+            item.category && item.category.toLowerCase() === category.toLowerCase()
           );
         }
 

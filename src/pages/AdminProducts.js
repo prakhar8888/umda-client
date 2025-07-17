@@ -10,6 +10,7 @@ function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // 🔁 Fetch products
   const fetchProducts = async () => {
     try {
       const data = await getAllProducts();
@@ -27,13 +28,17 @@ function AdminProducts() {
     }
   };
 
+  // 🗑️ Delete product
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmDelete) return;
+
     try {
       await deleteProduct(id);
-      fetchProducts();
+      fetchProducts(); // ✅ Refresh after delete
     } catch (err) {
       console.error("❌ Failed to delete product:", err);
-      alert("Delete failed");
+      alert("❌ Delete failed. Please try again.");
     }
   };
 
@@ -50,7 +55,7 @@ function AdminProducts() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-[#6a4c93]">Admin Panel</h1>
+        <h1 className="text-2xl font-bold text-[#6a4c93]">📦 Manage Products</h1>
         <Link
           to="/admin/products/new"
           className="bg-[#6a4c93] text-white px-4 py-2 rounded hover:bg-[#5a3c83]"
@@ -58,11 +63,12 @@ function AdminProducts() {
           ➕ Add Product
         </Link>
       </div>
+
       {products.length === 0 ? (
         <div className="text-center text-gray-600">No products found.</div>
       ) : (
-        <table className="w-full text-sm text-left">
-          <thead className="bg-gray-200">
+        <table className="w-full text-sm text-left border">
+          <thead className="bg-gray-100">
             <tr>
               <th className="p-3">Image</th>
               <th className="p-3">Name</th>

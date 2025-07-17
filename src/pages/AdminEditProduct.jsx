@@ -1,59 +1,83 @@
-// 📄 frontend/components/AdminAddProduct.jsx
+// 📄 frontend/pages/AdminEditProduct.jsx
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { addProduct } from "../api/productService";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { BACKEND_URL } from "../config";
 
-const AdminAddProduct = () => {
+// 🔥 Allowed Categories
+const CATEGORY_OPTIONS = ["Kurta", "Saree", "Dupatta", "Skirt"];
+
+const AdminEditProduct = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  // 📝 Form States
+  // 📝 States
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
-  const [image, setImage] = useState(""); // 🔗 URL only
+  const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
 
-  // 📤 Submit Handler
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // ✅ Load existing product
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/products/${id}`);
+        const product = res.data;
+        setName(product.name);
+        setPrice(product.price);
+        // ✅ If category is invalid, force to empty
+        if (CATEGORY_OPTIONS.includes(product.category)) {
+          setCategory(product.category);
+        } else {
+          setCategory(""); // Force user to pick again
+        }
+        setImage(product.image);
+        setDescription(product.description);
+      } catch (err) {
+        console.error("❌ Failed to load product:", err);
+        setError("❌ Failed to load product.");
+      }
+    };
+    fetchProduct();
+  }, [id]);
 
-    // ⚠️ Validation
+  // ✅ Update Handler
+  const handleUpdate = async (e) => {
+    e.preventDefault();
     if (!name || !price || !category || !image || !description) {
       setError("❌ All fields are required.");
       return;
     }
-
-    const newProduct = {
-      name,
-      price: Number(price),
-      category,
-      image,
-      description,
-    };
-
     try {
-      await addProduct(newProduct);
-      alert("✅ Product added successfully!");
+      await axios.put(`${BACKEND_URL}/api/products/${id}`, {
+        name,
+        price: Number(price),
+        category,
+        image,
+        description,
+      });
+      alert("✅ Product updated successfully!");
       navigate("/admin/products");
     } catch (err) {
-      console.error("🔥 Error while adding product:", err);
-      setError("❌ Failed to add product. Check the backend or try again.");
+      console.error("❌ Failed to update product:", err);
+      setError("❌ Failed to update product.");
     }
   };
 
   return (
     <div className="max-w-xl mx-auto p-8 bg-white shadow-md rounded-lg mt-10">
       <h2 className="text-2xl font-bold text-center text-purple-800 mb-6">
-        ➕ Add New Product
+        📝 Edit Product
       </h2>
 
       {error && (
         <p className="text-red-600 text-center font-medium mb-4">{error}</p>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleUpdate} className="space-y-4">
         <input
           type="text"
           placeholder="Name"
@@ -70,17 +94,18 @@ const AdminAddProduct = () => {
           className="w-full border rounded p-2"
         />
 
-        {/* ✅ FIXED Category Selector */}
+        {/* ✅ Category Dropdown */}
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="w-full border rounded p-2"
         >
           <option value="">Select Category</option>
-          <option value="Kurta">Kurta</option>
-          <option value="Saree">Saree</option>
-          <option value="Dupatta">Dupatta</option>
-          <option value="Skirt">Skirt</option>
+          {CATEGORY_OPTIONS.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
         </select>
 
         <input
@@ -91,7 +116,6 @@ const AdminAddProduct = () => {
           className="w-full border rounded p-2"
         />
 
-        {/* 🖼️ Live Image Preview */}
         {image && (
           <img
             src={image}
@@ -112,11 +136,11 @@ const AdminAddProduct = () => {
           type="submit"
           className="w-full bg-purple-700 text-white py-2 rounded hover:bg-purple-800 transition"
         >
-          Add Product
+          Update Product
         </button>
       </form>
     </div>
   );
 };
 
-export default AdminAddProduct;
+export default AdminEditProduct;
