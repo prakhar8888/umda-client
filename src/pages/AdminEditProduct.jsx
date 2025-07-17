@@ -5,14 +5,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 
-// 🔥 Allowed Categories
 const CATEGORY_OPTIONS = ["Kurta", "Saree", "Dupatta", "Skirt"];
 
 const AdminEditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 📝 States
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
@@ -20,20 +18,22 @@ const AdminEditProduct = () => {
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
 
-  // ✅ Load existing product
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/api/products/${id}`);
         const product = res.data;
+
         setName(product.name);
         setPrice(product.price);
-        // ✅ If category is invalid, force to empty
+
+        // ✅ Only keep allowed category — else empty
         if (CATEGORY_OPTIONS.includes(product.category)) {
           setCategory(product.category);
         } else {
-          setCategory(""); // Force user to pick again
+          setCategory(""); // force re-pick
         }
+
         setImage(product.image);
         setDescription(product.description);
       } catch (err) {
@@ -44,7 +44,6 @@ const AdminEditProduct = () => {
     fetchProduct();
   }, [id]);
 
-  // ✅ Update Handler
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!name || !price || !category || !image || !description) {
@@ -94,7 +93,7 @@ const AdminEditProduct = () => {
           className="w-full border rounded p-2"
         />
 
-        {/* ✅ Category Dropdown */}
+        {/* ✅ Fixed Dropdown */}
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
